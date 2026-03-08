@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
+import nhom12.example.nhom12.config.AppProperties;
 import nhom12.example.nhom12.model.User;
 import nhom12.example.nhom12.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+  private final AppProperties appProperties;
   private final JwtUtil jwtUtil;
   private final CustomUserDetailsService userDetailsService;
   private final UserRepository userRepository;
@@ -64,7 +66,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     String jwt = jwtUtil.generateToken(userDetails);
 
     String redirectUrl =
-        "/oauth2/callback"
+        frontendUrl()
+            + "/oauth2/callback"
             + "?token="
             + encode(jwt)
             + "&id="
@@ -81,5 +84,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
   private String encode(String value) {
     return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
+  }
+
+  private String frontendUrl() {
+    return appProperties.getFrontendUrl().replaceAll("/+$", "");
   }
 }

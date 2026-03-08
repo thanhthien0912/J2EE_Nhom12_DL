@@ -25,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final AppProperties appProperties;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -68,7 +69,12 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080"));
+    List<String> allowedOrigins =
+        appProperties.getCorsAllowedOrigins() == null || appProperties.getCorsAllowedOrigins().isEmpty()
+            ? List.of(appProperties.getFrontendUrl(), appProperties.getBackendUrl())
+            : appProperties.getCorsAllowedOrigins();
+    configuration.setAllowedOrigins(
+        allowedOrigins.stream().map(this::normalizeOrigin).distinct().toList());
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowedHeaders(
@@ -79,5 +85,9 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  private String normalizeOrigin(String origin) {
+    return origin == null ? "" : origin.trim().replaceAll("/+$", "");
   }
 }

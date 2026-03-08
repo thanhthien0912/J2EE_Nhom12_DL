@@ -26,6 +26,7 @@ export function Component() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
+  const googleAuthUrl = `${import.meta.env.VITE_BACKEND_URL.replace(/\/+$/, '')}/oauth2/authorization/google`;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -281,7 +282,7 @@ export function Component() {
               type="button"
               className="btn-outline flex w-full cursor-pointer items-center justify-center gap-2 transition-all hover:bg-surface-alt"
               onClick={() => {
-                window.location.href = '/oauth2/authorization/google';
+                window.location.href = googleAuthUrl;
               }}
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
