@@ -1,6 +1,6 @@
-# VPS Quick Deploy (Docker + Nginx)
+# VPS Quick Deploy (Docker + Nginx + Let's Encrypt)
 
-Huong dan nhanh de chay full project (frontend + backend + mongo) tren VPS bang Docker voi Nginx reverse proxy.
+Huong dan nhanh de chay full project (frontend + backend + mongo) tren VPS bang Docker voi Nginx reverse proxy va HTTPS free bang Let's Encrypt.
 
 ## 1) Clone source
 
@@ -31,8 +31,12 @@ Cap nhat toi thieu cac bien sau trong `.env`:
 APP_FRONTEND_URL=https://demo-java.honeysocial.click
 APP_BACKEND_URL=https://api1.honeysocial.click
 APP_CORS_ALLOWED_ORIGINS=https://demo-java.honeysocial.click
+FRONTEND_DOMAIN=demo-java.honeysocial.click
+BACKEND_DOMAIN=api1.honeysocial.click
 VITE_API_BASE_URL=https://api1.honeysocial.click/api
 VITE_BACKEND_URL=https://api1.honeysocial.click
+LETSENCRYPT_EMAIL=<your-email@example.com>
+LETSENCRYPT_STAGING=0
 GOOGLE_CLIENT_ID=<your-google-client-id>
 GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 GOOGLE_REDIRECT_URI=https://api1.honeysocial.click/login/oauth2/code/google
@@ -40,7 +44,7 @@ JWT_SECRET=<your-strong-jwt-secret>
 MONGODB_URI=mongodb://mongodb:27017/nhom12
 ```
 
-Neu chua co SSL tai VPS, tam thoi co the doi `https://` thanh `http://` trong `.env` cho dung voi cach ban terminate TLS.
+Dat `LETSENCRYPT_STAGING=1` neu muon test cap cert truoc khi lay cert that.
 
 ## 4) Mo cong tren VPS (neu dung UFW)
 
@@ -50,10 +54,17 @@ sudo ufw allow 443/tcp
 sudo ufw reload
 ```
 
-## 5) Chay app (1 lenh)
+## 5) Chay app
 
 ```bash
 docker compose up -d --build
+```
+
+Lenh tren se boot Nginx voi cert tam thoi de stack len duoc ngay. Sau do cap cert Let's Encrypt:
+
+```bash
+chmod +x scripts/init-letsencrypt.sh scripts/renew-letsencrypt.sh
+./scripts/init-letsencrypt.sh
 ```
 
 Truy cap:
@@ -61,7 +72,7 @@ Truy cap:
 - Frontend: `https://demo-java.honeysocial.click`
 - Backend API: `https://api1.honeysocial.click/api`
 
-Nginx container doc file cau hinh: `nginx/conf.d/default.conf`.
+Nginx doc config trong `nginx/conf.d/default.conf` va luu cert trong `nginx/certbot/conf/`.
 
 ## 6) Cau hinh Google OAuth (bat buoc)
 
@@ -86,6 +97,9 @@ docker compose logs -f backend
 # Chi xem log nginx
 docker compose logs -f nginx
 
+# Renew cert thu cong
+./scripts/renew-letsencrypt.sh
+
 # Restart nhanh
 docker compose restart
 
@@ -95,6 +109,16 @@ docker compose down
 # Cap nhat code va deploy lai
 git pull
 docker compose up -d --build
+```
+
+Tu dong renew moi dem luc 3h sang:
+
+```bash
+crontab -e
+```
+
+```cron
+0 3 * * * cd /root/J2EE_Nhom12_DL && ./scripts/renew-letsencrypt.sh >> /var/log/nhom12-letsencrypt.log 2>&1
 ```
 
 ## 8) Neu bi loi `google_failed`
@@ -109,4 +133,5 @@ Kiem tra 4 diem sau:
 ```bash
 docker compose down
 docker compose up -d --build
+./scripts/init-letsencrypt.sh
 ```

@@ -33,3 +33,7 @@ replay_pid*
 **/.env.*
 !**/.env*.example
 nhom12/src/main/resources/application.properties
+nginx/certbot/conf/*
+!nginx/certbot/conf/.gitkeep
+nginx/certbot/www/*
+!nginx/certbot/www/.gitkeep
