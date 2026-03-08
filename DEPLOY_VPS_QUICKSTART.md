@@ -1,6 +1,6 @@
-# VPS Quick Deploy (Docker + Nginx + Let's Encrypt)
+# VPS Quick Deploy (Docker + Nginx + Atlas + Let's Encrypt)
 
-Huong dan nhanh de chay full project (frontend + backend + mongo) tren VPS bang Docker voi Nginx reverse proxy va HTTPS free bang Let's Encrypt.
+Huong dan nhanh de chay full project (frontend + backend) tren VPS bang Docker, dung MongoDB Atlas, Nginx reverse proxy va HTTPS free bang Let's Encrypt.
 
 ## 1) Clone source
 
@@ -41,10 +41,11 @@ GOOGLE_CLIENT_ID=<your-google-client-id>
 GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 GOOGLE_REDIRECT_URI=https://api1.honeysocial.click/login/oauth2/code/google
 JWT_SECRET=<your-strong-jwt-secret>
-MONGODB_URI=mongodb://mongodb:27017/nhom12
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/nhom12?retryWrites=true&w=majority&appName=Cluster0
 ```
 
 Dat `LETSENCRYPT_STAGING=1` neu muon test cap cert truoc khi lay cert that.
+Dam bao IP public cua VPS da duoc them trong MongoDB Atlas > Network Access.
 
 ## 4) Mo cong tren VPS (neu dung UFW)
 
@@ -110,6 +111,12 @@ docker compose down
 git pull
 docker compose up -d --build
 ```
+
+Neu backend khong ket noi duoc Atlas, kiem tra nhanh:
+
+- VPS IP da duoc them trong MongoDB Atlas > Network Access
+- User trong MongoDB Atlas > Database Access con dung mat khau va quyen
+- `MONGODB_URI` trong `.env` khong bi xuong dong hay thua ky tu
 
 Tu dong renew moi dem luc 3h sang:
 

@@ -1,25 +1,12 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: nhom12-mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: nhom12
-    expose:
-      - "27017"
-    volumes:
-      - mongodb_data:/data/db
-
   backend:
     build:
       context: ./nhom12
       dockerfile: Dockerfile
     container_name: nhom12-backend
     restart: unless-stopped
-    depends_on:
-      - mongodb
     environment:
-      SPRING_DATA_MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/nhom12}
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI:-mongodb+srv://<username>:<password>@<cluster-url>/nhom12?retryWrites=true&w=majority&appName=Cluster0}
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-https://demo-java.honeysocial.click}
       APP_BACKEND_URL: ${APP_BACKEND_URL:-https://api1.honeysocial.click}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-https://demo-java.honeysocial.click}
@@ -80,6 +67,3 @@ services:
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
-
-volumes:
-  mongodb_data:
