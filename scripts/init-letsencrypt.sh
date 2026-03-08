@@ -50,7 +50,7 @@ request_cert() {
     staging_arg="--staging"
   fi
 
-  docker compose --profile tools run --rm certbot certonly \
+  if ! docker compose --profile tools run --rm certbot certonly \
     --webroot \
     -w /var/www/certbot \
     $staging_arg \
@@ -59,7 +59,26 @@ request_cert() {
     --no-eff-email \
     --rsa-key-size 4096 \
     --cert-name "$domain" \
-    -d "$domain"
+    -d "$domain"; then
+    if is_letsencrypt_cert "$live_path/fullchain.pem"; then
+      printf "%s\n" "Certbot returned non-zero but certificate for $domain is already available."
+      return
+    fi
+
+    printf "%s\n" "Retrying certificate request for $domain..."
+    sleep 5
+
+    docker compose --profile tools run --rm certbot certonly \
+      --webroot \
+      -w /var/www/certbot \
+      $staging_arg \
+      --email "$LETSENCRYPT_EMAIL" \
+      --agree-tos \
+      --no-eff-email \
+      --rsa-key-size 4096 \
+      --cert-name "$domain" \
+      -d "$domain"
+  fi
 }
 
 frontend_domain=$(extract_host "${APP_FRONTEND_URL:-https://demo-java.honeysocial.click}")
