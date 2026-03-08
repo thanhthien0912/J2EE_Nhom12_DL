@@ -1,0 +1,114 @@
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
+
+import apiClient from '@/api/client';
+import { ENDPOINTS } from '@/api/endpoints';
+import type { ApiResponse, PaginatedResponse } from '@/api/types';
+import ProductCard from '@/components/ui/ProductCard';
+import type { Product } from '@/types/product';
+
+export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    apiClient
+      .get<ApiResponse<PaginatedResponse<Product>>>(ENDPOINTS.PRODUCTS.BASE, {
+        params: { page: 0, size: 8 },
+      })
+      .then((res) => {
+        if (!active) return;
+        setProducts(res.data.data.content);
+      })
+      .catch(() => {
+        if (!active) return;
+        setProducts([]);
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <section className="relative py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Section header */}
+        <div className="mb-12 flex items-end justify-between">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <p className="mb-2 text-sm font-medium uppercase tracking-widest text-brand-accent">
+              Nổi bật
+            </p>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-brand md:text-4xl">
+              Sản phẩm đáng chú ý
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <Link
+              to="/products"
+              className="group hidden items-center gap-1.5 text-sm font-medium text-text-secondary transition-colors hover:text-brand no-underline md:flex"
+            >
+              Xem tất cả
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Product grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-[380px] animate-pulse rounded-2xl border border-border bg-surface-alt"
+              />
+            ))}
+          </div>
+        ) : products.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product, index) => (
+              <ProductCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-border bg-surface px-6 py-10 text-center">
+            <p className="text-text-secondary">Không thể tải sản phẩm nổi bật.</p>
+            <Link to="/products" className="btn-outline mt-4 inline-flex no-underline">
+              Xem tất cả sản phẩm
+            </Link>
+          </div>
+        )}
+
+        {/* Mobile "View all" */}
+        <div className="mt-8 flex justify-center md:hidden">
+          <Link
+            to="/products"
+            className="btn-outline inline-flex items-center gap-2 no-underline"
+          >
+            Xem tất cả sản phẩm
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
