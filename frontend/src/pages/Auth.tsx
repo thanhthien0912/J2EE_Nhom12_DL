@@ -281,7 +281,7 @@ export function Component() {
               type="button"
               className="btn-outline flex w-full cursor-pointer items-center justify-center gap-2 transition-all hover:bg-surface-alt"
               onClick={() => {
-                window.location.href = `${import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8080'}/oauth2/authorization/google`;
+                window.location.href = '/oauth2/authorization/google';
               }}
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">

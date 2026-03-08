@@ -21,6 +21,21 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/oauth2': {
+        target: 'http://localhost:8080',
+        changeOrigin: false,
+        secure: false,
+      },
+      '/login/oauth2': {
+        target: 'http://localhost:8080',
+        changeOrigin: false,
+        secure: false,
+      },
+      '/momo': {
+        target: 'http://localhost:8080',
+        changeOrigin: false,
+        secure: false,
+      },
     },
   },
   test: {

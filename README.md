@@ -128,7 +128,7 @@ java_cuoi_ki/
 ### Cách nhanh nhất (Docker - 1 lệnh chạy cả frontend + backend + MongoDB)
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 Sau khi chạy xong:
@@ -138,10 +138,17 @@ Sau khi chạy xong:
 | http://localhost:5173 | Frontend |
 | http://localhost:8080/api | Backend API |
 
-> Nếu cần cấu hình secret thật (JWT, Google OAuth2, MoMo), copy `.env.docker.example` thành `.env.docker` rồi chạy:
+Tren VPS, truy cap cong khai bang:
+
+| URL | Mô tả |
+| --- | ----- |
+| http://<VPS_IP>:5173 | Frontend public |
+| http://<VPS_IP>:8080/api | Backend API public |
+
+> Cấu hình secret thật: copy `.env.docker.example` thành `.env`, điền giá trị thật rồi chạy:
 >
 > ```bash
-> docker compose --env-file .env.docker up --build
+> docker compose up -d --build
 > ```
 
 ### 1. Clone dự án

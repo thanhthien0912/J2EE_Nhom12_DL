@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import nhom12.example.nhom12.model.User;
 import nhom12.example.nhom12.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,9 +23,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
   private final CustomUserDetailsService userDetailsService;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-
-  @Value("${app.frontend-url}")
-  private String frontendUrl;
 
   @Override
   public void onAuthenticationSuccess(
@@ -68,8 +64,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     String jwt = jwtUtil.generateToken(userDetails);
 
     String redirectUrl =
-        frontendUrl
-            + "/oauth2/callback"
+        "/oauth2/callback"
             + "?token="
             + encode(jwt)
             + "&id="

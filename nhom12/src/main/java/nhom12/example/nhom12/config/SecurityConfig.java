@@ -59,7 +59,7 @@ public class SecurityConfig {
                 oauth2
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler)
-                    .failureUrl("http://localhost:5173/login?error=google_failed"))
+                    .failureUrl("/login?error=google_failed"))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
