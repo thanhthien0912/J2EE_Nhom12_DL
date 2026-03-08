@@ -1,0 +1,8 @@
+target
+.git
+.idea
+.vscode
+run.log
+run8081.log
+*.log
+src/main/resources/application.properties
